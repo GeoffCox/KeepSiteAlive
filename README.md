@@ -7,7 +7,8 @@ This is most often used to prevent application pools from shutting down for site
 
 ## Installation
 1. Build and/or copy the BellaCodeKeepSiteAlive to your computer.  
-   * I recommend Program Files\BellaCodeKeepSiteAlive as a good location.
+   * You can download the EXE from the 'Built' folder in this repository.
+   * I recommend 'Program Files\BellaCodeKeepSiteAlive' as a good location.
 2. Create/Modify the SiteUrls.txt file in the same directory as the EXE.
    * Each line of the file represents a web site to ping regularly.
    * Each line should be the time between pings (hh:mm:ss), a space, and then the URL.
