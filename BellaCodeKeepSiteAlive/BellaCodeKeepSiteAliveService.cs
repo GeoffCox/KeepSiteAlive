@@ -69,6 +69,7 @@ namespace BellaCode.KeepSiteAlive
                 _isStopRequested = true;
                 Task.WaitAll(this._keepAliveTasks, TimeSpan.FromSeconds(30));
             }
+            this.serviceEventLog.WriteEntry("Service Stopped");
         }
 
         private static char[] SiteConfigSplitCharacters = new char[] { ' ', '\t' };
@@ -76,32 +77,40 @@ namespace BellaCode.KeepSiteAlive
 
         private IEnumerable<SiteConfiguration> LoadSiteUrls()
         {
-            var exePath = Assembly.GetExecutingAssembly().Location;
-            var exeDirectory = Path.GetDirectoryName(exePath);
-            var siteUrlsFile = Path.Combine(exeDirectory, "SiteUrls.txt");
+            try
+            {
+                var exePath = Assembly.GetExecutingAssembly().Location;
+                var exeDirectory = Path.GetDirectoryName(exePath);
+                var siteUrlsFile = Path.Combine(exeDirectory, "SiteUrls.txt");
 
-            var lines = File.ReadAllLines(siteUrlsFile);            
+                var lines = File.ReadAllLines(siteUrlsFile);
 
-            var sites = lines.Select(x =>
-                {
-                    var parts = x.Split(SiteConfigSplitCharacters, StringSplitOptions.RemoveEmptyEntries);
-                    var site = new SiteConfiguration();
-
-                    if (parts.Length > 1)
-                    {                        
-                        site.Delay = TimeSpan.Parse(parts[0]);
-                        site.Url = parts[1];
-                    }
-                    else if (parts.Length > 0)
+                var sites = lines.Select(x =>
                     {
-                        site.Delay = DefaultKeepAliveDelay;
-                        site.Url = parts[0];                        
-                    }
+                        var parts = x.Split(SiteConfigSplitCharacters, StringSplitOptions.RemoveEmptyEntries);
+                        var site = new SiteConfiguration();
 
-                    return site;
-                });
+                        if (parts.Length > 1)
+                        {
+                            site.Delay = TimeSpan.Parse(parts[0]);
+                            site.Url = parts[1];
+                        }
+                        else if (parts.Length > 0)
+                        {
+                            site.Delay = DefaultKeepAliveDelay;
+                            site.Url = parts[0];
+                        }
 
-            return sites.Where(x => x.Url != null && x.Delay > TimeSpan.Zero);
+                        return site;
+                    });
+
+                return sites.Where(x => x.Url != null && x.Delay > TimeSpan.Zero);
+            }
+            catch (Exception ex)
+            {
+                this.serviceEventLog.WriteEntry(string.Format("There was a problem loading SiteUrls.txt. {1}", ex.Message), EventLogEntryType.Error);
+            }
+
         }
 
         private Task StartKeepAlive(SiteConfiguration site)
@@ -128,7 +137,7 @@ namespace BellaCode.KeepSiteAlive
                         }
                         catch (Exception ex)
                         {
-                            this.serviceEventLog.WriteEntry(string.Format("Call to '{0}' threw an exception.", site.Url), EventLogEntryType.Error);
+                            this.serviceEventLog.WriteEntry(string.Format("There was a problem with the call to '{0}'. {1}", site.Url, ex.Message), EventLogEntryType.Error);
                             Debug.WriteLine("[" + DateTime.Now + "] " + site.Url + " : " + ex.Message);
                         }
 
