@@ -13,15 +13,18 @@ namespace BellaCode.KeepSiteAlive
 {
     public partial class BellaCodeKeepSiteAliveService : ServiceBase
     {
+        private System.Diagnostics.EventLog serviceEventLog;
+
         public BellaCodeKeepSiteAliveService()
         {
             InitializeComponent();
 
             if (!System.Diagnostics.EventLog.SourceExists("BellaCodeKeepSiteAliveService"))
             {
-                System.Diagnostics.EventLog.CreateEventSource("BellaCodeKeepSiteAliveService", "BellaCodeKeepSiteAliveService");
+                System.Diagnostics.EventLog.CreateEventSource("BellaCodeKeepSiteAliveService", string.Empty);
             }
 
+            this.serviceEventLog = new System.Diagnostics.EventLog();
             this.serviceEventLog.Source = "BellaCodeKeepSiteAliveService";
         }
 

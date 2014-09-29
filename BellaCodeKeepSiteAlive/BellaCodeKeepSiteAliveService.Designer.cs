@@ -28,18 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.serviceEventLog = new System.Diagnostics.EventLog();
-            ((System.ComponentModel.ISupportInitialize)(this.serviceEventLog)).BeginInit();
             // 
             // BellaCodeKeepSiteAliveService
             // 
             this.ServiceName = "BellaCodeKeepSiteAliveService";
-            ((System.ComponentModel.ISupportInitialize)(this.serviceEventLog)).EndInit();
-
         }
 
-        #endregion
-
-        private System.Diagnostics.EventLog serviceEventLog;
+        #endregion        
     }
 }
