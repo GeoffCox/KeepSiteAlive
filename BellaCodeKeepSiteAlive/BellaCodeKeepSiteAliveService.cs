@@ -109,6 +109,7 @@ namespace BellaCode.KeepSiteAlive
             catch (Exception ex)
             {
                 this.serviceEventLog.WriteEntry(string.Format("There was a problem loading SiteUrls.txt. {1}", ex.Message), EventLogEntryType.Error);
+                return null;
             }
 
         }
