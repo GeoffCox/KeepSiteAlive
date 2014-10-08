@@ -38,8 +38,6 @@ namespace BellaCode.KeepSiteAlive
 
         protected override void OnStart(string[] args)
         {
-            this.serviceEventLog.WriteEntry("Starting Service");
-
             try
             {
                 _isStopRequested = false;   //TODO: CancelationToken
@@ -55,7 +53,7 @@ namespace BellaCode.KeepSiteAlive
             }
             catch (Exception ex)
             {
-
+                this.serviceEventLog.WriteEntry(string.Format("There was a problem starting the service. {0}", ex.Message), EventLogEntryType.Error);
             }
         }
 
@@ -66,13 +64,11 @@ namespace BellaCode.KeepSiteAlive
 
         protected override void OnStop()
         {
-            this.serviceEventLog.WriteEntry("Stopping Service");
             if (_keepAliveTasks != null)
             {
                 _isStopRequested = true;
                 Task.WaitAll(this._keepAliveTasks, TimeSpan.FromSeconds(30));
             }
-            this.serviceEventLog.WriteEntry("Service Stopped");
         }
 
         private static char[] SiteConfigSplitCharacters = new char[] { ' ', '\t' };
@@ -128,6 +124,8 @@ namespace BellaCode.KeepSiteAlive
                         try
                         {
                             var request = WebRequest.Create(site.Url);
+                            request.UseDefaultCredentials = true;
+                            request.PreAuthenticate = true;                            
 
                             using (var response = request.GetResponse() as HttpWebResponse)
                             {
